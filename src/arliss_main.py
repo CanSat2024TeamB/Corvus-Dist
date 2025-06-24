@@ -7,10 +7,11 @@ import logger.sensor_log as sensor_log
 import logger.flight_log as flight_log
 import time
 
+# asyncioのtaskにつっこむ用、着地判定後の一連のシーケンス
 async def sequence(drone: DroneController, speed: float, target_coordinates: Coordinates, goal_radius: float, offboard_acceptable_distance, config: ConfigManager):
     logger = drone.get_logger_instance()
     config_section = "ARLISS"
-    status = config.read(config_section, "Status")
+    status = config.read(config_section, "Status") # 飛行状態かどうかをconfigに読み書きして管理（瞬電対策）
 
     if not status == "flight":
         logger.write("arming")
@@ -28,7 +29,7 @@ async def sequence(drone: DroneController, speed: float, target_coordinates: Coo
     while True:
         if await drone.flight_controller.go_to_location(speed, target_coordinates, goal_radius, margin_to_target=5):
             break
-        else:
+        else: # うまく目的地までたどり着けなかったら一旦着陸させてもう一回
             logger.write("arming")
             await drone.arm()
             logger.write("taking off")
@@ -37,7 +38,7 @@ async def sequence(drone: DroneController, speed: float, target_coordinates: Coo
             await drone.flight_controller.hovering(5)
             config.write(config_section, "Status", "flight")
 
-    logger.write("got target, landing temporarily")
+    logger.write("got target, landing temporarily") # ゴール付近で一旦着陸・再離陸させて終端誘導へ（高度を確保したい）
     await drone.flight_controller.land()
     await asyncio.sleep(10)
     await drone.flight_controller.disarm()
@@ -61,7 +62,7 @@ async def sequence(drone: DroneController, speed: float, target_coordinates: Coo
         await drone.flight_controller.takeoff(target_coordinates.altitude())
         result = False
 
-    if result:
+    if result: # エラーなく着陸できた場合、正確に着陸できたかどうかを評価
         await asyncio.sleep(10)
         await drone.flight_controller.disarm()
 
@@ -220,7 +221,6 @@ def countdown(seconds, logger):
         logger.write(f"{seconds} seconds")
         time.sleep(1)
         seconds -= 1
-
 
 if __name__ == "__main__":
     asyncio.run(main())

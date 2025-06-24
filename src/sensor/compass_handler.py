@@ -3,6 +3,7 @@ import mavsdk
 from control.attitude import Attitude
 
 class CompassHandler:
+# private
     def __init__(self, drone):
         self.drone = drone
         self.attitude = Attitude()
@@ -14,8 +15,8 @@ class CompassHandler:
         self.attitude.set_yaw(euler.yaw_deg)
         self.attitude.set_quaternion(quaternion.w, quaternion.x, quaternion.y, quaternion.z)
         return
- #############################################################以下がオープン
 
+# public
     async def invoke_loop(self) -> None:
         while True:
             attitude_euler = self.drone.telemetry.attitude_euler()

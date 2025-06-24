@@ -13,7 +13,7 @@ class Logger:
     def create_file(self) -> bool:
         # ディレクトリが存在しない場合は作成する
         os.makedirs(self.dir, exist_ok=True)
-        # ファイルを作成し、初期メッセージを書き込みます。
+        # ファイルを作成し、初期メッセージを書き込む
         self.write("Log file created")
         return True
 

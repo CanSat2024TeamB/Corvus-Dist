@@ -3,10 +3,10 @@ import serial.tools.list_ports
 from mavsdk import System
 
 from sensor.lidar_handler import LiDARHandler
-from control.battery import Battery_watch
-from control.gps_handler import GPSHandler
+from sensor.battery import Battery_watch
+from sensor.gps_handler import GPSHandler
 from control.position_manager import PositionManager
-from control.compass_handler import CompassHandler
+from sensor.compass_handler import CompassHandler
 from flight.flight_controller import FlightController
 from logger.logger import Logger
 from sensor.acceleration_velocity import Acceleration_Velocity
